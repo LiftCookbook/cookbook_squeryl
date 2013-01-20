@@ -1,0 +1,6 @@
+/target/
+/.idea/
+/.idea_modules/
+/console.devmode.log
+/project/target/
+/project/project/
