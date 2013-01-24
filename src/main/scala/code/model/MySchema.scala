@@ -1,43 +1,41 @@
 package code.model
 
 import org.squeryl.Schema
-import org.squeryl.annotations.{ Column, Transient }
-import net.liftweb.squerylrecord._
 import net.liftweb.record.{MetaRecord, Record}
-import net.liftweb.record.field.LongField
-import net.liftweb.record.field.StringField
-
+import net.liftweb.squerylrecord.KeyedRecord
+import net.liftweb.record.field.{StringField, LongField}
+import net.liftweb.squerylrecord.RecordTypeMode._
 
 object MySchema extends Schema {
 
+  val planets = table[Planet]
+  val satellites = table[Satellite]
+
+  val planetToSatellites = oneToManyRelation(planets, satellites).
+    via((p,s) => p.id === s.planetId)
+
+  on(satellites) { s =>
+    declare(s.planetId defineAs indexed("planet_idx"))
+  }
+
+  class Planet extends Record[Planet] with KeyedRecord[Long]   {
+    override def meta = Planet
+    override val idField = new LongField(this)
+    val name = new StringField(this, 256)
+    lazy val satellites = MySchema.planetToSatellites.left(this)
+  }
+
+  object Planet extends Planet with MetaRecord[Planet]
 
 
- // class Measurement extends Record[Measurement] with KeyedRecord[Long] with CreatedUpdated[Measurement] {
-  //   override def meta = Measurement
+  class Satellite extends Record[Satellite] with KeyedRecord[Long] {
+     override def meta = Satellite
+     override val idField = new LongField(this)
+     val name = new StringField(this, 256)
+     val planetId = new LongField(this)
+     lazy val planet = MySchema.planetToSatellites.right(this)
+  }
 
-  //   @Column(name = "id")
-  //   override val idField = new LongField(this)
-
-  //   @Column(name = "v")
-  //   val v = new StringField(this, 256)
-
-
-  // }
-
-  // object Measurement extends Measurement with MetaRecord[Measurement] {
-
-  // }
-
-  // val measurements = table[Measurement]("measurement")
-
-  // override def callbacks = Seq(
-  //   beforeUpdate[Measurement] call {_.onUpdate}
-  // )
-
-  // def dropAndCreate {
-  //   drop
-  //   create
-  // }
-
+  object Satellite extends Satellite with MetaRecord[Satellite]
 
 }

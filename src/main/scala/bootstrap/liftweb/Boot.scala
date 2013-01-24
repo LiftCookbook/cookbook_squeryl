@@ -28,6 +28,9 @@ class Boot {
     val entries = List(
       Menu.i("Home") / "index", // the simple way to declare a menu
 
+      Menu.i("One To Many") / "onetomany", // the simple way to declare a menu
+
+
       // more complex because this menu allows anything in the
       // /static path to be visible
       Menu(Loc("Static", Link(List("static"), true, "/static/index"),
@@ -57,8 +60,41 @@ class Boot {
     JQueryModule.InitParam.JQuery=JQueryModule.JQuery172
     JQueryModule.init()
 
-    initPostgresql()
+    // For Postgress:
+    // initPostgresql()
 
+    // For H2:
+    initH2()
+
+    import net.liftweb.squerylrecord.RecordTypeMode._
+    import net.liftweb.http.S
+    import net.liftweb.util.LoanWrapper
+
+    S.addAround(new LoanWrapper {
+      override def apply[T](f: => T): T = inTransaction { f }
+    })
+
+
+    // Create the schema and add query logging:
+    inTransaction {
+      code.model.MySchema.printDdl
+      code.model.MySchema.create
+      org.squeryl.Session.currentSession.setLogger( s => println(s) )
+    }
+
+    }
+
+  def initH2() {
+
+    Class.forName("org.h2.Driver")
+
+    import org.squeryl.adapters.H2Adapter
+    import net.liftweb.squerylrecord.SquerylRecord
+    import org.squeryl.Session
+
+    SquerylRecord.initWithSquerylSession(Session.create(
+      DriverManager.getConnection("jdbc:h2:mem:dbname;DB_CLOSE_DELAY=-1", "sa", ""),
+      new H2Adapter))
   }
 
 
@@ -69,24 +105,10 @@ class Boot {
     import org.squeryl.Session
     import org.squeryl.adapters._
     import net.liftweb.squerylrecord.SquerylRecord
-    import net.liftweb.http.S
-    import net.liftweb.util.LoanWrapper
-    import net.liftweb.squerylrecord.RecordTypeMode._
 
     def connection = DriverManager.getConnection("jdbc:postgresql://localhost/cookbook")
 
     SquerylRecord.initWithSquerylSession(Session.create(connection, new PostgreSqlAdapter))
-
-    S.addAround(new LoanWrapper {
-      override def apply[T](f: => T): T = inTransaction { f }
-    })
-
-    inTransaction {
-      code.model.MySchema.printDdl
-    }
-
-
-
   }
 
 }
