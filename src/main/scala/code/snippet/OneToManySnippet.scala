@@ -27,6 +27,8 @@ object SolarSystem {
   val phobos = findOrCreateSatellite("Phobos", mars)
   val deimos = findOrCreateSatellite("Deimos", mars)
 
+  val allPlanets = from(planets)(p => select(p))
+
 }
 
 
@@ -34,9 +36,10 @@ class OneToManySnippet {
 
   import SolarSystem._
 
-  def render = {
-    ".satellite-name *" #> mars.satellites.map(_.name.is)
-  }
-
+  def render =
+    "#planets-and-their-moons" #> allPlanets.map { p =>
+      ".planet-name *" #> p.name.is &
+      ".satellite-name *" #> p.satellites.map(_.name.is)
+    }
 
 }
