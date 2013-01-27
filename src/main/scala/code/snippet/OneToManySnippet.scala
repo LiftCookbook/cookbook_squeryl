@@ -8,12 +8,13 @@ import Helpers._
 import net.liftweb.squerylrecord.RecordTypeMode._
 
 
-object SolarSystem {
+class SolarSystem {
 
   def findOrCreatePlanet(n: String) : Planet =
     from(planets)(p => where(p.name === n) select(p)).headOption getOrElse {
       planets.insert(Planet.createRecord.name(n))
     }
+
 
   def findOrCreateSatellite(n: String, p: Planet) : Satellite =
     from(satellites)(s => where(s.name === n) select(s)).headOption getOrElse {
@@ -27,19 +28,26 @@ object SolarSystem {
   val phobos = findOrCreateSatellite("Phobos", mars)
   val deimos = findOrCreateSatellite("Deimos", mars)
 
-  val allPlanets = from(planets)(p => select(p))
+  val allPlanets =List(earth,mars)  //from(planets)(p => select(p))
 
 }
 
 
 class OneToManySnippet {
 
-  import SolarSystem._
 
-  def render =
+  def render = {
+
+    val data = new SolarSystem
+    import data._
+
+    val express = Satellite.createRecord.name("Mars Express")
+    mars.satellites.associate(express)
+
     "#planets-and-their-moons" #> allPlanets.map { p =>
       ".planet-name *" #> p.name.is &
       ".satellite-name *" #> p.satellites.map(_.name.is)
     }
 
+  }
 }

@@ -82,7 +82,7 @@ class Boot {
       org.squeryl.Session.currentSession.setLogger( s => println(s) )
     }
 
-    }
+  }
 
   def initH2() {
 
@@ -95,7 +95,17 @@ class Boot {
     SquerylRecord.initWithSquerylSession(Session.create(
       DriverManager.getConnection("jdbc:h2:mem:dbname;DB_CLOSE_DELAY=-1", "sa", ""),
       new H2Adapter))
+
+
+    if (Props.devMode) {
+      LiftRules.liftRequest.append({
+        case Req("console" ::_, _, _) => false
+      })
+    }
+
   }
+
+
 
 
   def initPostgresql() {

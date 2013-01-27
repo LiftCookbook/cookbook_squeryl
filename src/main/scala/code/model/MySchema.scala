@@ -5,6 +5,7 @@ import net.liftweb.record.{MetaRecord, Record}
 import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.record.field.{StringField, LongField}
 import net.liftweb.squerylrecord.RecordTypeMode._
+import org.squeryl.dsl.{StatefulOneToMany, StatefulManyToOne}
 
 object MySchema extends Schema {
 
@@ -22,7 +23,7 @@ object MySchema extends Schema {
     override def meta = Planet
     override val idField = new LongField(this)
     val name = new StringField(this, 256)
-    lazy val satellites = MySchema.planetToSatellites.left(this)
+    lazy val satellites : StatefulOneToMany[Satellite] = MySchema.planetToSatellites.leftStateful(this)
   }
 
   object Planet extends Planet with MetaRecord[Planet]
@@ -33,7 +34,7 @@ object MySchema extends Schema {
      override val idField = new LongField(this)
      val name = new StringField(this, 256)
      val planetId = new LongField(this)
-     lazy val planet = MySchema.planetToSatellites.right(this)
+     lazy val planet : StatefulManyToOne[Planet] = MySchema.planetToSatellites.rightStateful(this)
   }
 
   object Satellite extends Satellite with MetaRecord[Satellite]
