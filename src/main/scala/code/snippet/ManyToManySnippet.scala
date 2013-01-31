@@ -27,14 +27,22 @@ object SpaceMissions {
   val allPlanets = List(jupiter, saturn)
   val allProbes = List(juno, voyager1)
 
-  juno.planets.associate(jupiter)
-  voyager1.planets.associate(jupiter)
-  voyager1.planets.associate(saturn)
+  // You can insert relations like this:
+  // juno.planets.associate(jupiter)
+  // voyager1.planets.associate(jupiter)
+  // voyager1.planets.associate(saturn)
 
-  // Or... same results with:
+  // Or, like this:
   // jupiter.probes.associate(juno)
   // jupiter.probes.associate(voyager1)
   // saturn.probes.associate(voyager1)
+
+  // Either way, you get the same result.
+
+  // To add properties on the joining table:
+  probeVisits.insert(juno.planets.assign(jupiter).year(2016))
+  probeVisits.insert(voyager1.planets.assign(jupiter).year(1979))
+  probeVisits.insert(voyager1.planets.assign(saturn).year(1980))
 
 }
 
@@ -47,13 +55,16 @@ class ManyToManySnippet {
 
     import SpaceMissions._
 
-    "#planet-visits" #> allPlanets.map { p =>
-      ".planet-name *" #> p.name.is &
-      ".probe-name *" #> p.probes.map(_.name.is)
+    "#planet-visits" #> allPlanets.map { planet =>
+      ".planet-name *" #> planet.name.is &
+      ".probe-name *" #> planet.probes.map(_.name.is)
       } &
-    "#probe-visits" #> allProbes.map { p =>
-       ".probe-name *" #> p.name.is &
-       ".planet-name *" #> p.planets.map(_.name.is)
+    "#probe-visits" #> allProbes.map { probe =>
+       ".probe-name *" #> probe.name.is &
+       ".visit" #> probe.planets.associationMap.collect {
+         case (planet, visit) => ".planet-name *" #> planet.name.is &
+            ".year" #> visit.year.is
+       }
      }
 
   }

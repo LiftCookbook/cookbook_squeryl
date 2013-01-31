@@ -3,7 +3,7 @@ package code.model
 import org.squeryl.Schema
 import net.liftweb.record.{MetaRecord, Record}
 import net.liftweb.squerylrecord.KeyedRecord
-import net.liftweb.record.field.{StringField, LongField}
+import net.liftweb.record.field.{IntField, StringField, LongField}
 import net.liftweb.squerylrecord.RecordTypeMode._
 import org.squeryl.dsl.{ManyToMany, StatefulOneToMany, StatefulManyToOne}
 
@@ -57,21 +57,14 @@ object MySchema extends Schema {
 
   object Probe extends Probe with MetaRecord[Probe]
 
-
   class Visit extends Record[Visit] with KeyedRecord[Long] {
     override def meta = Visit
     override val idField = new LongField(this)
     val planetId = new LongField(this)
     val probeId = new LongField(this)
+    val year = new IntField(this)
   }
 
   object Visit extends Visit with MetaRecord[Visit]
-
-
-
-
-
-
-
 
 }
