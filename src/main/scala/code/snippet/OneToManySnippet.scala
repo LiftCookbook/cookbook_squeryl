@@ -15,7 +15,6 @@ class SolarSystem {
       planets.insert(Planet.createRecord.name(n))
     }
 
-
   def findOrCreateSatellite(n: String, p: Planet) : Satellite =
     from(satellites)(s => where(s.name === n) select(s)).headOption getOrElse {
       satellites.insert(Satellite.createRecord.name(n).planetId(p.idField.is))
@@ -28,13 +27,12 @@ class SolarSystem {
   val phobos = findOrCreateSatellite("Phobos", mars)
   val deimos = findOrCreateSatellite("Deimos", mars)
 
-  val allPlanets =List(earth,mars)  //from(planets)(p => select(p))
+  val allPlanets =List(earth,mars)
 
 }
 
 
 class OneToManySnippet {
-
 
   def render = {
 
