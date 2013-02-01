@@ -22,7 +22,7 @@ object SpaceMissions {
   val saturn = findOrCreatePlanet("Saturn")
 
   val juno = findOrCreateProbe("Juno")
-  val voyager1 = findOrCreateProbe("Voyager")
+  val voyager1 = findOrCreateProbe("Voyager 1")
 
   val allPlanets = List(jupiter, saturn)
   val allProbes = List(juno, voyager1)

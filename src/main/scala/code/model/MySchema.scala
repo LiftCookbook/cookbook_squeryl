@@ -25,6 +25,9 @@ object MySchema extends Schema {
     (probe, planet, visit) => (visit.probeId === probe.id, visit.planetId === planet.id)
   }
 
+  // Cascading deletes:
+  // probeVisits.rightForeignKeyDeclaration.constrainReference(onDelete cascade)
+  // probeVisits.leftForeignKeyDeclaration.constrainReference(onDelete cascade)
 
 
   class Planet extends Record[Planet] with KeyedRecord[Long]   {
