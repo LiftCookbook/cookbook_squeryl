@@ -19,7 +19,9 @@ object MySchema extends Schema {
     via((p,s) => p.id === s.planetId)
 
   on(satellites) { s =>
-    declare(s.planetId defineAs indexed("planet_idx"))
+    declare(
+      s.planetId defineAs(indexed("planet_idx"))
+    )
   }
 
   val probes = table[Probe]
