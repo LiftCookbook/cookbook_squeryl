@@ -33,7 +33,11 @@ object MySchema extends Schema {
   // probeVisits.leftForeignKeyDeclaration.constrainReference(onDelete cascade)
 
 
-  class Planet extends Record[Planet] with KeyedRecord[Long] {
+  override def callbacks = Seq(
+    beforeUpdate[Planet] call {_.onUpdate}
+  )
+
+  class Planet extends Record[Planet] with KeyedRecord[Long] with CreatedUpdated[Planet] {
     override def meta = Planet
     override val idField = new LongField(this)
 

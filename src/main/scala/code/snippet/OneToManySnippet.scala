@@ -39,6 +39,7 @@ class OneToManySnippet {
     val data = new SolarSystem
     import data._
 
+    // Doing this here means we will duplicate the association each time the snippet runs:
     val express = Satellite.createRecord.name("Mars Express")
     mars.satellites.associate(express)
 

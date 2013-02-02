@@ -51,8 +51,6 @@ class ManyToManySnippet {
 
   def render = {
 
-    org.squeryl.Session.currentSession.setLogger( s => println(s) )
-
     import SpaceMissions._
 
     "#planet-visits" #> allPlanets.map { planet =>
