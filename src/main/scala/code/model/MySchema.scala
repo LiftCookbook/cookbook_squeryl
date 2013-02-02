@@ -6,6 +6,8 @@ import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.record.field.{IntField, StringField, LongField}
 import net.liftweb.squerylrecord.RecordTypeMode._
 import org.squeryl.dsl.{ManyToMany, StatefulOneToMany, StatefulManyToOne}
+import net.liftweb.util.FieldError
+import net.liftweb.http.S
 
 object MySchema extends Schema {
 
@@ -30,21 +32,33 @@ object MySchema extends Schema {
   // probeVisits.leftForeignKeyDeclaration.constrainReference(onDelete cascade)
 
 
-  class Planet extends Record[Planet] with KeyedRecord[Long]   {
+  class Planet extends Record[Planet] with KeyedRecord[Long] {
     override def meta = Planet
     override val idField = new LongField(this)
 
     val name = new StringField(this, 256) {
-      override def validations = valMinLen(5, "Name too short") _ :: super.validations
+      override def validations =
+        valMinLen(5, "Name too short") _ ::
+        valUnique("validation.planet") _ ::
+        super.validations
     }
+
+    private def valUnique(errorMsg: => String)(name: String): List[FieldError] =
+      Planet.unique_?(name) match {
+        case true => FieldError(this.name, S ? errorMsg) :: Nil
+        case false => Nil
+      }
 
     lazy val satellites : StatefulOneToMany[Satellite] = MySchema.planetToSatellites.leftStateful(this)
 
     lazy val probes : ManyToMany[Probe,Visit] = MySchema.probeVisits.right(this)
   }
 
-  object Planet extends Planet with MetaRecord[Planet]
-
+  object Planet extends Planet with MetaRecord[Planet] {
+    def unique_?(name: String) = from(planets) { p =>
+      where(lower(p.name) === lower(name)) select(p)
+    }.isEmpty
+  }
 
   class Satellite extends Record[Satellite] with KeyedRecord[Long] {
      override def meta = Satellite
