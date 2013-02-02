@@ -13,6 +13,7 @@ import Loc._
 import net.liftmodules.JQueryModule
 import net.liftweb.http.js.jquery._
 import java.sql.{DriverManager, Connection}
+import org.squeryl.Session
 
 
 /**
@@ -73,7 +74,11 @@ class Boot extends Loggable {
     import net.liftweb.util.LoanWrapper
 
     S.addAround(new LoanWrapper {
-      override def apply[T](f: => T): T = inTransaction { f }
+      override def apply[T](f: => T): T = inTransaction {
+        // If you want to enable logging everywhere:
+        // Session.currentSession.setLogger( s => logger.info(s) )
+        f
+      }
     })
 
 
