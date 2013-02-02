@@ -6,6 +6,7 @@ import model.MySchema._
 import net.liftweb.util._
 import Helpers._
 import net.liftweb.squerylrecord.RecordTypeMode._
+import net.liftweb.common.Loggable
 
 
 class SolarSystem {
@@ -32,14 +33,19 @@ class SolarSystem {
 }
 
 
-class OneToManySnippet {
+class OneToManySnippet extends Loggable {
 
   def render = {
 
     val data = new SolarSystem
     import data._
 
+    import org.squeryl.Session
+    Session.currentSession.setLogger( s => logger.info(s) )
+
+
     // Doing this here means we will duplicate the association each time the snippet runs:
+    logger.info("Creating Mars Express record")
     val express = Satellite.createRecord.name("Mars Express")
     mars.satellites.associate(express)
 
