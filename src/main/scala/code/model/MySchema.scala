@@ -73,7 +73,7 @@ object MySchema extends Schema {
 
     val randomId = new UniqueIdField(this,32) {}
 
-    val uuid = new StringField(this, 37) {
+    val uuid = new StringField(this, 36) {
       override def defaultValue = UUID.randomUUID().toString
     }
 
