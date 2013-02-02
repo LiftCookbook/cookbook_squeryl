@@ -33,8 +33,13 @@ object MySchema extends Schema {
   class Planet extends Record[Planet] with KeyedRecord[Long]   {
     override def meta = Planet
     override val idField = new LongField(this)
-    val name = new StringField(this, 256)
+
+    val name = new StringField(this, 256) {
+      override def validations = valMinLen(5, "Name too short") _ :: super.validations
+    }
+
     lazy val satellites : StatefulOneToMany[Satellite] = MySchema.planetToSatellites.leftStateful(this)
+
     lazy val probes : ManyToMany[Probe,Visit] = MySchema.probeVisits.right(this)
   }
 

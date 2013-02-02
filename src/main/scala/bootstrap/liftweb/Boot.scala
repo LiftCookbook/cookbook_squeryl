@@ -19,8 +19,9 @@ import java.sql.{DriverManager, Connection}
  * A class that's instantiated early and run.  It allows the application
  * to modify lift's environment
  */
-class Boot {
+class Boot extends Loggable {
   def boot {
+
     // where to search snippet
     LiftRules.addToPackages("code")
 
@@ -30,6 +31,7 @@ class Boot {
 
       Menu.i("One To Many") / "onetomany",
       Menu.i("Many To Many") / "manytomany",
+      Menu.i("Planet Name Validation") / "validate",
 
       // more complex because this menu allows anything in the
       // /static path to be visible
@@ -79,7 +81,7 @@ class Boot {
     inTransaction {
       code.model.MySchema.printDdl
       code.model.MySchema.create
-      org.squeryl.Session.currentSession.setLogger( s => println(s) )
+      org.squeryl.Session.currentSession.setLogger(s => logger.info(s))
     }
 
   }
