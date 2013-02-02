@@ -3,11 +3,12 @@ package code.model
 import org.squeryl.Schema
 import net.liftweb.record.{MetaRecord, Record}
 import net.liftweb.squerylrecord.KeyedRecord
-import net.liftweb.record.field.{IntField, StringField, LongField}
+import net.liftweb.record.field.{UniqueIdField, IntField, StringField, LongField}
 import net.liftweb.squerylrecord.RecordTypeMode._
 import org.squeryl.dsl.{ManyToMany, StatefulOneToMany, StatefulManyToOne}
 import net.liftweb.util.FieldError
 import net.liftweb.http.S
+import java.util.UUID
 
 object MySchema extends Schema {
 
@@ -65,6 +66,15 @@ object MySchema extends Schema {
     lazy val satellites : StatefulOneToMany[Satellite] = MySchema.planetToSatellites.leftStateful(this)
 
     lazy val probes : ManyToMany[Probe,Visit] = MySchema.probeVisits.right(this)
+
+    val randomId = new UniqueIdField(this,32) {}
+
+    val uuid = new StringField(this, 37) {
+      override def defaultValue = UUID.randomUUID().toString
+    }
+
+
+
   }
 
   object Planet extends Planet with MetaRecord[Planet] {
