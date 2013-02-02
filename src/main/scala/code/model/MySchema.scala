@@ -41,13 +41,26 @@ object MySchema extends Schema {
         valMinLen(5, "Name too short") _ ::
         valUnique("validation.planet") _ ::
         super.validations
+
+      override def setFilter =
+        trim _ ::
+        titleCase _ ::
+        super.setFilter
     }
 
     private def valUnique(errorMsg: => String)(name: String): List[FieldError] =
       Planet.unique_?(name) match {
-        case true => FieldError(this.name, S ? errorMsg) :: Nil
-        case false => Nil
+        case false => FieldError(this.name, S ? errorMsg) :: Nil
+        case true => Nil
       }
+
+    def titleCase(in: String) =
+      in.split("\\s").
+      map(_.toList).
+      collect {
+        case x :: xs  => (Character.toUpperCase(x).toString :: xs).mkString
+      }.mkString(" ")
+
 
     lazy val satellites : StatefulOneToMany[Satellite] = MySchema.planetToSatellites.leftStateful(this)
 
