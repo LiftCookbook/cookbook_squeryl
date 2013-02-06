@@ -8,7 +8,7 @@ class PlanetsSpec extends Specification with DBTestKit {
 
   sequential
 
-  "Planets" >> {
+  "Solar System" >> {
 
     "know that Mars has two moons" >> InMemoryDB {
 
@@ -18,6 +18,17 @@ class PlanetsSpec extends Specification with DBTestKit {
 
       mars.satellites.size must_== 2
     }
+
+    "moons can be associated to planets" >> InMemoryDB {
+
+      val earth = planets.insert(Planet.createRecord.name("Earth"))
+
+      val moon = Satellite.createRecord.name("Moon").planetId(earth.idField.is)
+      moon.save
+
+      moon.planet.one.map(_.name.is) must beSome("Earth")
+    }
+
 
   }
 
