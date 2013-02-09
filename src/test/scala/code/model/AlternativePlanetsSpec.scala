@@ -1,16 +1,21 @@
 package code.model
 
-import org.specs2.mutable._
-import net.liftweb.squerylrecord.RecordTypeMode._
 import MySchema._
 
-class PlanetsSpec extends Specification with DBTestKit {
+import org.specs2.mutable._
+import org.specs2.specification.AroundContextExample
+import net.liftweb.squerylrecord.RecordTypeMode._
+
+
+class AlternativePlanetsSpec extends Specification with AroundContextExample[InMemoryDB] {
 
   sequential
 
+   def aroundContext = new InMemoryDB()
+
   "Solar System" >> {
 
-    "know that Mars has two moons" >> InMemoryDB() {
+    "know that Mars has two moons" >> {
 
       val mars = planets.insert(Planet.createRecord.name("Mars"))
       Satellite.createRecord.name("Phobos").planetId(mars.idField.is).save
@@ -19,7 +24,7 @@ class PlanetsSpec extends Specification with DBTestKit {
       mars.satellites.size must_== 2
     }
 
-    "moons can be associated to planets" >> InMemoryDB() {
+    "moons can be associated to planets" >> {
 
       val earth = planets.insert(Planet.createRecord.name("Earth"))
 

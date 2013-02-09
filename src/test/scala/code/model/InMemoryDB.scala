@@ -14,6 +14,11 @@ import net.liftweb.squerylrecord.RecordTypeMode._
 import org.specs2.mutable.Around
 import org.specs2.execute.Result
 
+trait TestLiftSession {
+  def session = new LiftSession("", StringHelpers.randomString(20), Empty)
+  def inSession[T](a: => T): T = S.init(Req.nil, session) { a }
+}
+
 trait DBTestKit extends Loggable {
 
   Class.forName("org.h2.Driver")
@@ -21,7 +26,7 @@ trait DBTestKit extends Loggable {
   Logger.setup = Full(net.liftweb.util.LoggingAutoConfigurer())
   Logger.setup.foreach { _.apply() }
 
-  private def configureH2() = {
+  def configureH2() = {
     SquerylRecord.initWithSquerylSession(
       Session.create(
         DriverManager.getConnection("jdbc:h2:mem:dbname;DB_CLOSE_DELAY=-1", "sa", ""),
@@ -29,7 +34,7 @@ trait DBTestKit extends Loggable {
     )
   }
 
-  private def createDb() {
+  def createDb() {
     inTransaction {
       try {
         MySchema.drop
@@ -42,21 +47,20 @@ trait DBTestKit extends Loggable {
     }
   }
 
-  trait TestLiftSession {
-    def session = new LiftSession("", StringHelpers.randomString(20), Empty)
-    def inSession[T](a: => T): T = S.init(Req.nil, session) { a }
-  }
+}
 
-  object InMemoryDB extends Around with TestLiftSession {
-    def around[T <% Result](testToRun: =>T) = {
-      configureH2
-      createDb
-      inSession {
-        inTransaction {
-          testToRun
-        }
+case class InMemoryDB() extends Around with DBTestKit with TestLiftSession {
+  def around[T <% Result](testToRun: =>T) = {
+    configureH2
+    createDb
+    inSession {
+      inTransaction {
+        testToRun
       }
     }
   }
-
 }
+
+
+
+
