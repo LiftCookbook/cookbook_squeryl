@@ -70,23 +70,23 @@ class Boot extends Loggable {
     import net.liftweb.util.LoanWrapper
 
     S.addAround(new LoanWrapper {
-      override def apply[T](f: => T): T = inTransaction {
+      override def apply[T](f: => T): T = {
 
-        // If you want to enable logging everywhere:
-        // import org.squeryl.Session
-        // Session.currentSession.setLogger( s => logger.info(s) )
-
-        val result = try {
-          Right(f)
-        } catch {
-          case e: LiftFlowOfControlException => Left(e)
+        val result = inTransaction {
+          // If you want to enable logging everywhere:
+          // import org.squeryl.Session
+          // Session.currentSession.setLogger( s => logger.info(s) )
+          try {
+            Right(f)
+          } catch {
+            case e: LiftFlowOfControlException => Left(e)
+          }
         }
 
         result match {
           case Right(r) => r
           case Left(exception) => throw exception
         }
-
 
       }
     })
