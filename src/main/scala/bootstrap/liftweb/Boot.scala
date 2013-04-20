@@ -1,10 +1,7 @@
 package bootstrap.liftweb
 
 import net.liftweb._
-import common.Full
-import http.Html5Properties
 import util._
-import util.Helpers._
 
 import common._
 import http._
@@ -12,8 +9,7 @@ import sitemap._
 import Loc._
 import net.liftmodules.JQueryModule
 import net.liftweb.http.js.jquery._
-import java.sql.{DriverManager, Connection}
-import org.squeryl.Session
+import java.sql.DriverManager
 
 
 /**
@@ -75,11 +71,26 @@ class Boot extends Loggable {
 
     S.addAround(new LoanWrapper {
       override def apply[T](f: => T): T = inTransaction {
+
         // If you want to enable logging everywhere:
+        // import org.squeryl.Session
         // Session.currentSession.setLogger( s => logger.info(s) )
-        f
+
+        val result = try {
+          Right(f)
+        } catch {
+          case e: LiftFlowOfControlException => Left(e)
+        }
+
+        result match {
+          case Right(r) => r
+          case Left(exception) => throw exception
+        }
+
+
       }
     })
+
 
 
     // Create the schema and add query logging:
