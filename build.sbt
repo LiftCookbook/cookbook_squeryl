@@ -18,7 +18,7 @@ parallelExecution in Test := false
 scalacOptions ++= Seq("-deprecation", "-unchecked")
 
 libraryDependencies ++= {
-  val liftVersion = "2.5-RC5"
+  val liftVersion = "2.5"
   Seq(
     "net.liftweb" %% "lift-webkit" % liftVersion,
     "postgresql" % "postgresql" % "9.1-901.jdbc4",
