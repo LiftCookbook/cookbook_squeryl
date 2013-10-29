@@ -1,5 +1,5 @@
-libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % "0.12.0-0.2.11.1")
+addSbtPlugin("com.earldouglas" % "xsbt-web-plugin" % "0.4.2")
 
-addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.4.0")
+addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.5.2")
 
-addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.1.2")
+addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.4.0")

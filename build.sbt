@@ -11,14 +11,14 @@ resolvers ++= Seq(
   "releases" at "http://oss.sonatype.org/content/repositories/releases"
 )
 
-seq(com.github.siasia.WebPlugin.webSettings :_*)
+seq(webSettings :_*)
 
 parallelExecution in Test := false
 
 scalacOptions ++= Seq("-deprecation", "-unchecked")
 
 libraryDependencies ++= {
-  val liftVersion = "2.5"
+  val liftVersion = "2.5.1"
   Seq(
     "net.liftweb" %% "lift-webkit" % liftVersion,
     "postgresql" % "postgresql" % "9.1-901.jdbc4",
